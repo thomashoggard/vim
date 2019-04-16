@@ -3,29 +3,40 @@ call plug#begin('~/.vim/plugged')
 
 "============== UI ====================
 Plug 'talek/obvious-resize'
-Plug 'itchyny/lightline.vim'
 Plug 'scrooloose/nerdtree'
+Plug 'vim-airline/vim-airline'
 
-" Themes
+""" Themes
 Plug 'morhetz/gruvbox'
 Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' }
 Plug 'drewtempelmeyer/palenight.vim'
 Plug 'joshdick/onedark.vim'
+Plug 'mhartington/oceanic-next'
+Plug 'ayu-theme/ayu-vim' 
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'crusoexia/vim-monokai'
 
-" Icons
+""" Icons
 Plug 'ryanoasis/vim-devicons'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight' " might cause performance issues
 
-"============== Coding ================
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'luochen1990/rainbow' " Rainbow brackets
+"""============== Coding ================
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+" Plug 'luochen1990/rainbow' " Rainbow brackets (contains a bug where concealing breaks)
 Plug 'tpope/vim-commentary' " Comment out lines
 Plug 'airblade/vim-rooter'  " Change working direction to project root
 Plug 'mattn/emmet-vim'
 
-" git
-Plug 'vim-scripts/gitignore'
+"repl
+Plug 'metakirby5/codi.vim'
 
-" syntax
+"" git
+Plug 'vim-scripts/gitignore'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+"" syntax
 Plug 'chemzqm/vim-jsx-improve'
 Plug 'othree/yajs.vim'
 Plug 'othree/javascript-libraries-syntax.vim'
@@ -34,15 +45,13 @@ Plug 'elzr/vim-json'
 Plug 'JulesWang/css.vim'
 Plug 'jparise/vim-graphql'
 
-" linting
-Plug 'w0rp/ale'
-
 " autocomplete
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+Plug 'honza/vim-snippets' " works with coc
 Plug 'chun-yang/auto-pairs'
 "
 "============== Misc. ==================
-Plug 'vimwiki/vimwiki' " Note Taking
+" Plug 'vimwiki/vimwiki' " Note Taking
 
 call plug#end()
 
@@ -50,21 +59,10 @@ call plug#end()
 " VIM Settings "
 """"""""""""""""
 set hidden " allow the ability to switch buffers without saving
-
-" Enable full color support in terminals
-set termguicolors
-
-" windows only
-if has('win32') || has('win64') 
-  set clipboard=unnamedplus
-  autocmd VimEnter * GuiFont! Hack\ NF:h11
-  set grepprg=rg\ --vimgrep\ --smart-case\ --glob\ !package-lock.json\ $*
-  set grepformat=%f:%l:%c:%m
-else
-  set guifont=Hack\ NF:h11:cANSI
-  set clipboard=unnamedplus
-endif
-
+set termguicolors " Enable full color support in terminals
+" set guifont=Hack\ NF:h11:cANSI
+set guifont=Fira\ Code:h11:cANSI
+set clipboard=unnamedplus
 set number     	" Show line numbers in the gutter
 set ignorecase 	" Make searching case insensitive
 set smartcase  	" ... unless the query has capital letters
@@ -73,16 +71,15 @@ set nowrap     	" Disable text wrap
 set splitright	" Split new vertical windows to the right
 set splitbelow 	" Split new horizontal windows to the bottom
 set cursorline  " highlight the line containing the cursor
+set expandtab shiftwidth=2 tabstop=2 " indentation
 
-" indentation
-set expandtab
-set shiftwidth=2
-set tabstop=2
+" Java
 autocmd FileType java set noexpandtab|set shiftwidth=4|set tabstop=4
 
+" terminal
+tnoremap <Esc> <C-\><C-n> " map <ESC> to exit terminal mode
 
 " Use <C-L> to clear the highlighting of :set hlsearch
-" Use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-L>', 'n') ==# ''
   nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
 endif
@@ -101,45 +98,58 @@ set titlestring=%{getcwd()}
 " gruvbox
 " set background=dark
 " let g:gruvbox_italic=1
-" let g:lightline = { 'colorscheme': 'gruvbox' }
 " colorscheme gruvbox
 
-" challenger deep
+" challenger deep (sucks for jsx and diff)
 " colorscheme challenger_deep
-" let g:challenger_deep_terminal_italics = 0
-" let g:lightline = { 'colorscheme': 'challenger_deep'}
 
-" colorscheme palenight
+let g:palenight_color_overrides = { 
+      \ "white": { "gui": "#FFF", "cterm": "145", "cterm16": "7" } ,
+      \ "black": { "gui": "#1E1C31", "cterm": "233", "cterm16": "0" },
+      \ "purple": { "gui": "#63F2F1", "cterm": "122", "cterm16": "14" },
+      \ "red": { "gui": "#FF8080", "cterm": "204", "cterm16": "1" },
+      \ "blue": { "gui": "#91DDFF", "cterm": "39", "cterm16": "4" },
+      \ "yellow": { "gui": "#FFE9AA", "cterm": "180", "cterm16": "3" }
+      \ }
 
-colorscheme onedark
-let g:lightline = {
-  \ 'colorscheme': 'onedark',
-  \ }
+set background=dark
+colorscheme palenight
+let g:palenight_terminal_italics=1
 
-" jsx - makes the end tag match the color of the start tag 
-" hi! link xmlTag Special 
-" hi! link xmlEndTag Statement 
-" let g:javascript_plugin_jsdoc = 1
-" let g:use_javascript_libs = 'react'
+" ayu (gdiff sucks)
+" let ayucolor="light"  " for light version of theme
+" let ayucolor="mirage" " for mirage version of theme
+" let ayucolor="dark"   " for dark version of theme
+" colorscheme ayu
+
+" colorscheme dracula
+" colorscheme monokai
+" colorscheme onedark
+
+" let g:oceanic_next_terminal_bold = 1
+" let g:oceanic_next_terminal_italic = 1
+" colorscheme OceanicNext
+
 "==========================================
 
+" airline
+let g:airline_powerline_fonts = 1
+
 " Obvious Resize 
-" =================
 noremap <silent> <C-Up> :<C-U>ObviousResizeUp<CR>
 noremap <silent> <C-Down> :<C-U>ObviousResizeDown<CR>
 noremap <silent> <C-Left> :<C-U>ObviousResizeLeft<CR>
 noremap <silent> <C-Right> :<C-U>ObviousResizeRight<CR>
+let g:obvious_resize_default = 4
 
-" Ale
-" =================
-let g:ale_fix_on_save = 1
-let g:ale_sign_error = '●'
-let g:ale_sign_warning = '●'
-let b:ale_fixers = ['prettier']
-let b:ale_linters =['eslint']
+" GIT Gutter
+let g:gitgutter_sign_added = '✚'
+let g:gitgutter_sign_modified = '~'
+let g:gitgutter_sign_removed = ''
+let g:gitgutter_sign_removed_first_line = '~'
+let g:gitgutter_sign_modified_removed = '~'
 
 " NERDTree
-" =================
 nmap ,n :NERDTreeFind<CR> " reveal file in tree
 
 let g:NERDTreeIndicatorMapCustom = {
@@ -162,35 +172,54 @@ let g:NERDTreeDirArrowExpandable = "\u00a0"
 let g:NERDTreeDirArrowCollapsible = "\u00a0"
 let NERDTreeNodeDelimiter = "\x07"
 let NERDTreeShowLineNumbers=1
+let NERDTreeMinimalUI = 1
+let NERDTreeDirArrows = 1
 highlight! link NERDTreeFlags NERDTreeDir
 
-" ctrl-p
-" =================
-let g:ctrlp_user_command = ['.git', 'cd %s && git ls-files -co --exclude-standard']
-nnoremap <F5> :CtrlPBuffer<CR>
+" fzf 
+let $FZF_DEFAULT_COMMAND = 'rg --files'
+let g:fzf_history_dir = '~/.local/share/fzf-history'
+au TermOpen * tnoremap <Esc> <c-\><c-n>
+au FileType fzf tunmap <Esc>
+nnoremap <C-p> :Files<Cr>
+nnoremap <F5> :Buffers<CR>
 
 " rainbow brackets
-" =================
-let g:rainbow_active=1
-let g:rainbow_conf = {
-\	'separately': {
-\		'nerdtree': 0,
-\	}
-\}
+" let g:rainbow_active=1
+" let g:rainbow_conf = {
+" \	'separately': {
+" \		'nerdtree': 0,
+" \	}
+" \}
 
 " Emmet
-" ========
-let g:user_emmet_leader_key='<Tab>'
+" let g:user_emmet_leader_key='<Tab>'
  
-" Deoplete
-" =================
-let g:deoplete#enable_at_startup = 1
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" coc.vim
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+
+" tab navigation
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" <cr> to confirm
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" trigger completion
+inoremap <silent><expr> <C-space> coc#refresh()
+" format on save
+autocmd BufWritePre *.js CocCommand prettier.formatFile
+autocmd BufWritePre *.json CocCommand prettier.formatFile
 
 " Vimwiki
-" =================
-let g:vimwiki_list = [{ 'syntax': 'markdown', 'ext': '.md'}]
+" let g:vimwiki_list = [{ 'syntax': 'markdown', 'ext': '.md'}]
+" let g:vim_markdown_folding_disabled = 1
 
 " javascript libaries
 let g:used_javascript_libs = 'react,underscore'
