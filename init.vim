@@ -27,6 +27,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-commentary' " Comment out lines
 Plug 'airblade/vim-rooter'  " Change working direction to project root
 Plug 'mattn/emmet-vim'
+Plug 'majutsushi/tagbar'
 " not working
 Plug 'meain/vim-package-info', { 'do': 'npm install' }
 
@@ -243,6 +244,9 @@ inoremap <silent><expr> <C-space> coc#refresh()
 " format on save
 autocmd BufWritePre *.js CocCommand prettier.formatFile
 autocmd BufWritePre *.json CocCommand prettier.formatFile
+
+" tagbar
+nmap <F8> :TagbarToggle<CR>
 
 " Vimwiki
 " let g:vimwiki_list = [{ 'syntax': 'markdown', 'ext': '.md'}]
