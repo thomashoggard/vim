@@ -27,6 +27,8 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-commentary' " Comment out lines
 Plug 'airblade/vim-rooter'  " Change working direction to project root
 Plug 'mattn/emmet-vim'
+" not working
+Plug 'meain/vim-package-info', { 'do': 'npm install' }
 
 "repl
 Plug 'metakirby5/codi.vim'
@@ -72,6 +74,25 @@ set splitright	" Split new vertical windows to the right
 set splitbelow 	" Split new horizontal windows to the bottom
 set cursorline  " highlight the line containing the cursor
 set expandtab shiftwidth=2 tabstop=2 " indentation
+
+" remap leader to spacebar
+nnoremap <space> <leader>
+" escape to normalmap
+inoremap jk <esc>
+inoremap <esc> <nop>
+" 'strong' left
+nnoremap H 0
+" 'strong' right
+nnoremap L $
+" edit vim config
+nnoremap <leader>ev :vsplit $VIMCONFIG/init.vim<cr>
+" reload VIM config
+nnoremap <leader>sv :source $VIMCONFIG/init.vim<cr>
+
+" move screen down
+nnoremap <c-j> 4<c-E>
+" move screen up
+nnoremap <c-k> 4<c-Y>
 
 " Java
 autocmd FileType java set noexpandtab|set shiftwidth=4|set tabstop=4
@@ -183,6 +204,12 @@ au TermOpen * tnoremap <Esc> <c-\><c-n>
 au FileType fzf tunmap <Esc>
 nnoremap <C-p> :Files<Cr>
 nnoremap <F5> :Buffers<CR>
+" fuzzy find Vim commands
+nnoremap <leader>c :Commands<cr>
+" fuzzy find lines in current file
+nnoremap <c-f> :BLines<cr>
+" fuzzy find text in the working directory map
+nnoremap <leader>r :Rg<cr>
 
 " rainbow brackets
 " let g:rainbow_active=1
