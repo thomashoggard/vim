@@ -125,26 +125,41 @@ set titlestring=%{getcwd()}
 " challenger deep (sucks for jsx and diff)
 " colorscheme challenger_deep
 
-let g:palenight_color_overrides = { 
-      \ "white": { "gui": "#FFF", "cterm": "145", "cterm16": "7" } ,
-      \ "black": { "gui": "#1E1C31", "cterm": "233", "cterm16": "0" },
-      \ "purple": { "gui": "#63F2F1", "cterm": "122", "cterm16": "14" },
-      \ "red": { "gui": "#FF8080", "cterm": "204", "cterm16": "1" },
-      \ "blue": { "gui": "#91DDFF", "cterm": "39", "cterm16": "4" },
-      \ "yellow": { "gui": "#FFE9AA", "cterm": "180", "cterm16": "3" }
-      \ }
+" let g:palenight_color_overrides = { 
+"       \ "white": { "gui": "#FFF", "cterm": "145", "cterm16": "7" } ,
+"       \ "black": { "gui": "#1E1C31", "cterm": "233", "cterm16": "0" },
+"       \ "purple": { "gui": "#63F2F1", "cterm": "122", "cterm16": "14" },
+"       \ "red": { "gui": "#FF8080", "cterm": "204", "cterm16": "1" },
+"       \ "blue": { "gui": "#91DDFF", "cterm": "39", "cterm16": "4" },
+"       \ "yellow": { "gui": "#FFE9AA", "cterm": "180", "cterm16": "3" }
+"       \ }
 
-set background=dark
-colorscheme palenight
-let g:palenight_terminal_italics=1
+" let g:palenight_terminal_italics=1
 
 " ayu (gdiff sucks)
 " let ayucolor="light"  " for light version of theme
 " let ayucolor="mirage" " for mirage version of theme
 " let ayucolor="dark"   " for dark version of theme
 " colorscheme ayu
+function! MyHighlights() abort
+    hi normal      cterm=none ctermbg=233              gui=none guibg=#1e1c31
+    hi nontext     cterm=none ctermbg=233              gui=none guibg=#1e1c31
+    " hi DraculaPink ctermfg=212 ctermbg=233 guifg=#FF8080
+    " hi DraculaYellow  ctermfg=212 ctermbg=233 guifg=#62D196
+    " hi DraculaGreen ctermfg=212 ctermbg=233 guifg=#63F2F1
+    hi EndOfBuffer ctermbg=bg ctermfg=bg guibg=bg guifg=bg
+endfunction
 
-" colorscheme dracula
+augroup MyColors
+    autocmd!
+    autocmd ColorScheme dracula call MyHighlights()
+    autocmd ColorScheme * call MyHighlights()
+augroup END 
+
+colorscheme dracula
+" colorscheme palenight
+
+
 " colorscheme monokai
 " colorscheme onedark
 
