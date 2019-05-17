@@ -28,8 +28,10 @@ Plug 'tpope/vim-commentary' " Comment out lines
 Plug 'airblade/vim-rooter'  " Change working direction to project root
 Plug 'mattn/emmet-vim'
 Plug 'majutsushi/tagbar'
-" not working
 Plug 'meain/vim-package-info', { 'do': 'npm install' }
+
+" csv
+Plug 'chrisbra/csv.vim'
 
 "repl
 Plug 'metakirby5/codi.vim'
@@ -47,14 +49,18 @@ Plug 'othree/html5.vim'
 Plug 'elzr/vim-json'
 Plug 'JulesWang/css.vim'
 Plug 'jparise/vim-graphql'
+Plug 'posva/vim-vue'
 
 " autocomplete
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'honza/vim-snippets' " works with coc
 Plug 'chun-yang/auto-pairs'
+
+" documentation
+Plug 'rizzatti/dash.vim'
 "
 "============== Misc. ==================
-" Plug 'vimwiki/vimwiki' " Note Taking
+Plug 'vimwiki/vimwiki' " Note Taking
 
 call plug#end()
 
@@ -64,7 +70,7 @@ call plug#end()
 set hidden " allow the ability to switch buffers without saving
 set termguicolors " Enable full color support in terminals
 " set guifont=Hack\ NF:h11:cANSI
-set guifont=Fira\ Code:h11:cANSI
+" set guifont=Fira\ Code:h11:cANSI
 set clipboard=unnamedplus
 set number     	" Show line numbers in the gutter
 set ignorecase 	" Make searching case insensitive
@@ -75,6 +81,7 @@ set splitright	" Split new vertical windows to the right
 set splitbelow 	" Split new horizontal windows to the bottom
 set cursorline  " highlight the line containing the cursor
 set expandtab shiftwidth=2 tabstop=2 " indentation
+set foldmethod=indent " Use indentation for folding
 
 " remap leader to spacebar
 nnoremap <space> <leader>
@@ -100,6 +107,9 @@ autocmd FileType java set noexpandtab|set shiftwidth=4|set tabstop=4
 
 " terminal
 tnoremap <Esc> <C-\><C-n> " map <ESC> to exit terminal mode
+
+" enable mouse scrolling
+set mouse=a
 
 " Use <C-L> to clear the highlighting of :set hlsearch
 if maparg('<C-L>', 'n') ==# ''
@@ -134,7 +144,7 @@ set titlestring=%{getcwd()}
 "       \ "yellow": { "gui": "#FFE9AA", "cterm": "180", "cterm16": "3" }
 "       \ }
 
-" let g:palenight_terminal_italics=1
+let g:palenight_terminal_italics=1
 
 " ayu (gdiff sucks)
 " let ayucolor="light"  " for light version of theme
@@ -142,11 +152,11 @@ set titlestring=%{getcwd()}
 " let ayucolor="dark"   " for dark version of theme
 " colorscheme ayu
 function! MyHighlights() abort
-    hi normal      cterm=none ctermbg=233              gui=none guibg=#1e1c31
-    hi nontext     cterm=none ctermbg=233              gui=none guibg=#1e1c31
-    " hi DraculaPink ctermfg=212 ctermbg=233 guifg=#FF8080
-    " hi DraculaYellow  ctermfg=212 ctermbg=233 guifg=#62D196
-    " hi DraculaGreen ctermfg=212 ctermbg=233 guifg=#63F2F1
+    " hi normal      cterm=none ctermbg=233              gui=none guibg=#1e1c31
+    " hi nontext     cterm=none ctermbg=233              gui=none guibg=#1e1c31
+    hi DraculaPink ctermfg=212 ctermbg=233 guifg=#FF6188
+    hi DraculaGreen ctermfg=212 ctermbg=233 guifg=#a9dc76
+    hi DraculaYellow  ctermfg=212 ctermbg=233 guifg=#ffd866
     hi EndOfBuffer ctermbg=bg ctermfg=bg guibg=bg guifg=bg
 endfunction
 
@@ -173,10 +183,10 @@ colorscheme dracula
 let g:airline_powerline_fonts = 1
 
 " Obvious Resize 
-noremap <silent> <C-Up> :<C-U>ObviousResizeUp<CR>
-noremap <silent> <C-Down> :<C-U>ObviousResizeDown<CR>
-noremap <silent> <C-Left> :<C-U>ObviousResizeLeft<CR>
-noremap <silent> <C-Right> :<C-U>ObviousResizeRight<CR>
+noremap <silent> <Up> :<C-U>ObviousResizeUp<CR>
+noremap <silent> <Down> :<C-U>ObviousResizeDown<CR>
+noremap <silent> <Left> :<C-U>ObviousResizeLeft<CR>
+noremap <silent> <Right> :<C-U>ObviousResizeRight<CR>
 let g:obvious_resize_default = 4
 
 " GIT Gutter
@@ -201,7 +211,7 @@ let g:NERDTreeIndicatorMapCustom = {
     \ 'Ignored'   : '☒',
     \ "Unknown"   : "?"
     \ }
-let g:NERDTreeIgnore=['.git', 'node_modules', 'package-lock.json']
+let g:NERDTreeIgnore=['.git', 'node_modules', 'package-lock.json', '.pyc']
 let g:WebDevIconsNerdTreeBeforeGlyphPadding = ""
 let g:WebDevIconsUnicodeDecorateFolderNodes = v:true
 " Disable arrow icons at the left side of folders for NERDTree.
@@ -211,13 +221,19 @@ let NERDTreeNodeDelimiter = "\x07"
 let NERDTreeShowLineNumbers=1
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
+let NERDTreeAutoDeleteBuffer = 1
 highlight! link NERDTreeFlags NERDTreeDir
 
 " fzf 
 let $FZF_DEFAULT_COMMAND = 'rg --files'
 let g:fzf_history_dir = '~/.local/share/fzf-history'
-au TermOpen * tnoremap <Esc> <c-\><c-n>
-au FileType fzf tunmap <Esc>
+
+augroup fzf_commands
+  autocmd!
+  autocmd TermOpen * tnoremap <Esc> <c-\><c-n>
+  autocmd FileType fzf tunmap <Esc>
+augroup END
+
 nnoremap <C-p> :Files<Cr>
 nnoremap <F5> :Buffers<CR>
 " fuzzy find Vim commands
@@ -264,8 +280,8 @@ autocmd BufWritePre *.json CocCommand prettier.formatFile
 nmap <F8> :TagbarToggle<CR>
 
 " Vimwiki
-" let g:vimwiki_list = [{ 'syntax': 'markdown', 'ext': '.md'}]
-" let g:vim_markdown_folding_disabled = 1
+let g:vimwiki_list = [{ 'syntax': 'markdown', 'ext': '.md'}]
+let g:vim_markdown_folding_disabled = 1
 
 " javascript libaries
 let g:used_javascript_libs = 'react,underscore'
